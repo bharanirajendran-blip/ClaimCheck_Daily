@@ -154,7 +154,8 @@ def run_pipeline(
         max_workers=max_workers,
     )
 
-    final_state: PipelineState = build_graph().invoke(initial_state)
-    report = final_state.report or DailyReport()
+    final_state = build_graph().invoke(initial_state)
+    # LangGraph returns a dict; extract the report safely
+    report = (final_state.get("report") if isinstance(final_state, dict) else final_state.report) or DailyReport()
     logger.info("=== Pipeline complete — %d verdicts ===", len(report.verdicts))
     return report

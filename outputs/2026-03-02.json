@@ -1,0 +1,58 @@
+{
+  "date": "2026-03-02",
+  "generated_at": "2026-03-02T17:40:16Z",
+  "results": [
+    {
+      "claim": "FactChecking Trump’s State of the Union Address",
+      "source": "FactCheck.org",
+      "verdict": "UNVERIFIABLE",
+      "confidence": 0.0,
+      "summary": "The claim provided is an article title, not a specific factual assertion, and the date mentioned is beyond the current knowledge cutoff. Therefore, it cannot be verified.",
+      "key_evidence": []
+    },
+    {
+      "claim": "Trump Misleads on Drug Pricing Deals",
+      "source": "FactCheck.org",
+      "verdict": "UNVERIFIABLE",
+      "confidence": 0.0,
+      "summary": "The claim regarding Trump's statements on drug pricing deals is unverifiable due to the reference to a future date beyond the current knowledge cutoff. Without specific details or context, the claim cannot be assessed.",
+      "key_evidence": []
+    },
+    {
+      "claim": "Trump and Musk Amplify Long-Ago Debunked  Mail-In Vote Fraud Claim",
+      "source": "FactCheck.org",
+      "verdict": "UNVERIFIABLE",
+      "confidence": 0.2,
+      "summary": "The claim that Trump and Musk amplified a long-ago debunked mail-in vote fraud claim in February 2026 cannot be verified due to the lack of access to future data and specific details about the statements made. Historical context shows that similar claims have been largely debunked, but without current information, a definitive verdict is not possible.",
+      "key_evidence": [
+        "Lack of access to the February 2026 FactCheck.org article",
+        "No specific statements from Trump and Musk available",
+        "Historical context on mail-in voting fraud claims up to early 2025"
+      ]
+    },
+    {
+      "claim": "Trump Oversells Recent U.S. Economic Growth",
+      "source": "FactCheck.org",
+      "verdict": "UNVERIFIABLE",
+      "confidence": 0.5,
+      "summary": "The claim about Trump overselling recent U.S. economic growth cannot be verified due to the publication date being beyond the current knowledge cutoff. Without specific claims or data from early 2026, it is impossible to assess the accuracy of the statement.",
+      "key_evidence": [
+        "The publication date is February 11, 2026, which is beyond the knowledge cutoff of early 2025.",
+        "No specific economic claims or data from early 2026 are available for verification."
+      ]
+    },
+    {
+      "claim": "WHO Didn’t Recommend Lockdowns, Contrary to Health Officials’ Suggestions",
+      "source": "FactCheck.org",
+      "verdict": "MIXED",
+      "confidence": 0.85,
+      "summary": "The claim that the WHO did not recommend lockdowns is largely accurate but oversimplified. The WHO did not advocate for lockdowns as a primary means of controlling COVID-19, emphasizing other measures like testing and contact tracing. However, they did not oppose lockdowns entirely, acknowledging them as potentially necessary temporary measures. The WHO's guidance was more nuanced, suggesting lockdowns as a last resort with significant socioeconomic consequences.",
+      "key_evidence": [
+        "Dr. David Nabarro interview (October 2020): WHO does not advocate lockdowns as primary control measure.",
+        "WHO guidance documents: Emphasized 'find, test, trace, isolate' as core strategy.",
+        "WHO press briefings: Acknowledged 'devastating' impacts of lockdowns.",
+        "WHO February 2020 report: Noted China's lockdowns but did not recommend them as a primary strategy."
+      ]
+    }
+  ]
+}

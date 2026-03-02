@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClaimCheck Daily</title>
+  <title>ClaimCheck Daily — Archive</title>
   <style>
     :root {
       --bg: #0f172a; --surface: #1e293b; --text: #f1f5f9;
@@ -11,27 +11,36 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif;
-           max-width: 860px; margin: 0 auto; padding: 3rem 1rem; text-align: center; }
-    h1 { font-size: 2.5rem; margin-bottom: .5rem; }
-    p  { color: var(--muted); margin-bottom: 2rem; }
-    .badge { display: inline-block; background: var(--surface); border-radius: .5rem;
-             padding: 1rem 2rem; margin: .5rem; font-size: 1.1rem; }
-    a { color: var(--accent); text-decoration: none; }
-    footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; }
+            max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
+    a { color: var(--accent); }
+    header { margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+    h1 { font-size: 2rem; }
+    .date { color: var(--muted); margin-top: .25rem; }
+    .card { background: var(--surface); border-radius: .75rem; padding: 1.5rem;
+             margin-bottom: 1.5rem; }
+    .verdict-badge { display: inline-block; padding: .25rem .75rem; border-radius: 999px;
+                      font-weight: 700; font-size: .85rem; margin-bottom: .75rem;
+                      color: #000; }
+    .claim-text { font-size: 1.1rem; margin-bottom: .5rem; }
+    .source, .confidence { color: var(--muted); font-size: .85rem; margin-bottom: .4rem; }
+    .summary { margin-top: .75rem; line-height: 1.6; }
+    details { margin-top: .75rem; }
+    details summary { cursor: pointer; color: var(--accent); }
+    ul { margin: .5rem 0 0 1.25rem; line-height: 1.8; }
+    .archive { list-style: none; padding: 0; }
+    .archive li { margin: .4rem 0; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: .85rem;
+              border-top: 1px solid #334155; padding-top: 1rem; }
   </style>
 </head>
 <body>
-  <h1>📋 ClaimCheck Daily</h1>
-  <p>Automated fact-checking powered by Claude + GPT-4o · Published daily via GitHub Actions</p>
 
-  <div class="badge">
-    <strong>Latest report:</strong><br>
-    <a href="#">No reports yet — run the pipeline!</a>
-  </div>
-
-  <footer>
-    This index is regenerated automatically after each pipeline run.<br>
-    Powered by <a href="https://www.anthropic.com">Anthropic Claude</a> + OpenAI GPT-4o.
-  </footer>
+            <header><h1>ClaimCheck Daily</h1><p>Automated fact-checking, every day.</p></header>
+            <main>
+              <h2>Latest: <a href="2026-03-02.html">2026-03-02</a></h2>
+              <h3>Archive</h3>
+              <ul class="archive"><li><a href="2026-03-02.html">2026-03-02</a></li></ul>
+            </main>
+            <footer>Powered by Claude + GPT-4o · <a href="https://github.com">Source</a></footer>
 </body>
 </html>

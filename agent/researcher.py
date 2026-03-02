@@ -62,9 +62,9 @@ RESEARCH_SYSTEM_PROMPT = textwrap.dedent("""\
 @dataclass
 class Researcher:
     model: str = "claude-opus-4-5-20251101"
-    max_tokens: int = 4096
+    max_tokens: int = 16000       # must be greater than thinking_budget
     use_extended_thinking: bool = True
-    thinking_budget: int = 8000  # tokens allocated to <thinking>
+    thinking_budget: int = 10000  # tokens allocated to <thinking>
     _client: anthropic.Anthropic = field(
         default_factory=anthropic.Anthropic, init=False, repr=False
     )
