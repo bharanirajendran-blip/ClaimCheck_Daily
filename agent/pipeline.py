@@ -29,9 +29,24 @@ from .utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
-# Singleton agent instances shared across node calls
-_director   = Director()
-_researcher = Researcher()
+# Lazily-initialised singletons — not created until first node call,
+# so API keys are guaranteed to be loaded from .env before instantiation.
+_director:   Director   | None = None
+_researcher: Researcher | None = None
+
+
+def _get_director() -> Director:
+    global _director
+    if _director is None:
+        _director = Director()
+    return _director
+
+
+def _get_researcher() -> Researcher:
+    global _researcher
+    if _researcher is None:
+        _researcher = Researcher()
+    return _researcher
 
 
 # ── Node functions ────────────────────────────────────────────────────────────
@@ -49,7 +64,7 @@ def select_node(state: PipelineState) -> dict[str, Any]:
     if not state.candidates:
         logger.warning("[select] No candidates to select from.")
         return {"selected": []}
-    selected = _director.select_claims(state.candidates)
+    selected = _get_director().select_claims(state.candidates)
     logger.info("[select] Director chose %d claims.", len(selected))
     return {"selected": selected}
 
@@ -65,7 +80,7 @@ def research_node(state: PipelineState) -> dict[str, Any]:
 
     results: dict[str, ResearchResult] = {}
     with ThreadPoolExecutor(max_workers=state.max_workers) as pool:
-        futures = {pool.submit(_researcher.research, claim): claim for claim in state.selected}
+        futures = {pool.submit(_get_researcher().research, claim): claim for claim in state.selected}
         for future in as_completed(futures):
             claim = futures[future]
             try:
@@ -85,8 +100,9 @@ def verdict_node(state: PipelineState) -> dict[str, Any]:
         if not research:
             logger.warning("[verdict] No research for claim %s — skipping.", claim.id)
             continue
+        logger.info("[verdict] Findings preview for %s: %s", claim.id, research.findings[:300])
         try:
-            verdict = _director.synthesize_verdict(claim, research)
+            verdict = _get_director().synthesize_verdict(claim, research)
             verdicts.append(verdict)
             logger.info("[verdict] %s → %s (%.0f%%)", claim.id, verdict.verdict, verdict.confidence * 100)
         except Exception as exc:
@@ -96,7 +112,7 @@ def verdict_node(state: PipelineState) -> dict[str, Any]:
 
 def publish_node(state: PipelineState) -> dict[str, Any]:
     """Node 5 — Publisher renders HTML to docs/ and JSON to outputs/."""
-    report = _director.build_report(state.verdicts, state.selected)
+    report = _get_director().build_report(state.verdicts, state.selected)
     Publisher(docs_dir=state.docs_dir, outputs_dir=state.outputs_dir).publish(report)
     logger.info("[publish] Report written → %s/%s.html", state.docs_dir, report.date_slug)
     return {"report": report}

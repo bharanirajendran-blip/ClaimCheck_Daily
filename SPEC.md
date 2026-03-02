@@ -4,14 +4,15 @@
 **Author:** Bharani Rajendran
 **Date:** 2026-03-02
 **Repo:** https://github.com/bharanirajendran-blip/ClaimCheck_Daily
+**Live site:** https://bharanirajendran-blip.github.io/ClaimCheck_Daily/
 
 ---
 
 ## 1. Project Overview
 
-ClaimCheck Daily is an automated fact-checking pipeline that runs every day, pulls claims from real news and fact-checking RSS feeds, researches each one using AI, produces verdicts, and publishes the results as a GitHub Pages website.
+ClaimCheck Daily is an automated fact-checking pipeline that runs every day, pulls claims from real news and fact-checking RSS feeds, researches each one using AI with live web access, produces verdicts, and publishes the results as a GitHub Pages website.
 
-The core idea is a two-agent architecture where each agent does what it is best at: GPT-4o acts as a high-level Director that selects and evaluates claims, and Claude acts as a deep Researcher that investigates the evidence. LangGraph wires the agents together into a stateful, validated pipeline. Pydantic enforces data integrity at every step.
+The core idea is a two-agent architecture where each agent does what it is best at: GPT-4o acts as a high-level Director that selects and evaluates claims, and Claude acts as a deep Researcher that fetches and reads live articles then investigates the evidence. LangGraph wires the agents together into a stateful, validated pipeline. Pydantic enforces data integrity at every step.
 
 ---
 
@@ -26,11 +27,39 @@ The core idea is a two-agent architecture where each agent does what it is best 
 
 **Researcher (Claude Opus)**
 - Receives one claim at a time from the pipeline
+- Runs an agentic tool-use loop: calls `fetch_url` to read live article content, then reasons over it
 - Uses extended thinking (10,000 budget tokens, 16,000 max tokens) to deeply reason through the claim
 - Produces a structured research report covering sub-questions, supporting evidence, contradicting evidence, caveats, and key sources
 - Multiple claims are researched in parallel using a ThreadPoolExecutor
 
-### 2.2 Pipeline Flow (LangGraph StateGraph)
+**fetch_url tool**
+- Defined in `agent/tools.py` using the Anthropic tool-use API schema
+- Fetches a URL using `httpx`, strips HTML with BeautifulSoup, returns clean plain text
+- Truncates to 8,000 characters to stay within context window limits
+- Claude decides autonomously when and what to fetch — it is not hardcoded
+
+### 2.2 Researcher Agentic Tool-Use Loop
+
+```
+User message (claim + source URL)
+        │
+        ▼
+  Claude reasons → calls fetch_url(url)
+        │
+        ▼
+  tools.py fetches URL → returns plain text
+        │
+        ▼
+  Claude reads article → may call fetch_url again for more sources
+        │
+        ▼
+  Claude produces final structured research report
+        │  (max 5 rounds to prevent infinite loops)
+        ▼
+  ResearchResult returned to pipeline
+```
+
+### 2.3 Pipeline Flow (LangGraph StateGraph)
 
 ```
 START
@@ -42,7 +71,7 @@ harvest_node       ← parse RSS/Atom feeds → candidate Claims
 select_node        ← Director (GPT-4o) picks top 5 claims
   │
   ▼ (conditional: abort if nothing selected)
-research_node      ← Researcher (Claude) investigates each claim in parallel
+research_node      ← Researcher (Claude + fetch_url) investigates in parallel
   │
   ▼
 verdict_node       ← Director synthesises one Verdict per ResearchResult
@@ -56,7 +85,7 @@ END
 
 The graph has two conditional edges that short-circuit the pipeline early with a clean exit if no usable claims are found at either the harvest or selection stage.
 
-### 2.3 State Management
+### 2.4 State Management
 
 All state is carried in a single `PipelineState` Pydantic model that flows through every LangGraph node. Each node receives the full state, updates only its own fields, and returns a partial dict that LangGraph merges back. This means the whole pipeline state is inspectable and validated at every transition.
 
@@ -86,7 +115,8 @@ ClaimCheck_Daily/
 │   ├── __init__.py        package exports
 │   ├── models.py          Pydantic data models + PipelineState
 │   ├── director.py        GPT-4o Director agent
-│   ├── researcher.py      Claude Opus Researcher agent
+│   ├── researcher.py      Claude Opus Researcher agent (tool-use loop)
+│   ├── tools.py           fetch_url tool — live web article fetcher
 │   ├── feeds.py           RSS/Atom feed parser
 │   ├── pipeline.py        LangGraph StateGraph orchestration
 │   ├── publisher.py       HTML + JSON output renderer
@@ -137,7 +167,6 @@ Each run harvests up to 10 entries per feed (70 candidates max), which the Direc
 A dark-themed GitHub Pages page with one card per claim. Each card shows the verdict badge (colour-coded), the claim text, source link, confidence percentage, summary, and a collapsible key evidence section.
 
 ### JSON Archive (`outputs/YYYY-MM-DD.json`)
-Machine-readable structured output with the following shape:
 
 ```json
 {
@@ -162,12 +191,14 @@ Machine-readable structured output with the following shape:
 
 | Package | Version | Purpose |
 |---|---|---|
-| `anthropic` | ≥ 0.40.0 | Claude Researcher API (extended thinking) |
+| `anthropic` | ≥ 0.40.0 | Claude Researcher API (extended thinking + tool use) |
 | `openai` | ≥ 1.50.0 | GPT-4o Director API (JSON mode) |
 | `langgraph` | ≥ 0.2.0 | StateGraph pipeline orchestration |
 | `langchain-core` | ≥ 0.3.0 | Required by LangGraph |
 | `pydantic` | ≥ 2.7.0 | Data validation and state modelling |
 | `feedparser` | ≥ 6.0.11 | RSS/Atom feed ingestion |
+| `httpx` | ≥ 0.27.0 | HTTP client for fetch_url tool |
+| `beautifulsoup4` | ≥ 4.12.0 | HTML stripping for fetch_url tool |
 | `python-dotenv` | ≥ 1.0.0 | `.env` loading |
 | `pyyaml` | ≥ 6.0.2 | `feeds.yaml` parsing |
 
@@ -197,18 +228,27 @@ python run.py --feeds my_feeds.yaml --log-level DEBUG --workers 5
 
 ## 9. Known Limitations
 
-**Knowledge cutoff:** Claude's training data ends in early 2025. Claims about events in 2026 are typically returned as `UNVERIFIABLE` because Claude cannot access live web content. The next planned upgrade is to give the Researcher access to a web search tool so it can fetch and read the actual source articles at runtime.
+**Paywalled articles:** The `fetch_url` tool can only read publicly accessible pages. Paywalled content returns a login page instead of article text. Claude handles this gracefully by falling back to training knowledge for those sources.
 
-**Claim extraction:** The current feed parser uses the article headline as the claim text. Headlines are not always precise factual claims — some are article titles (e.g. "FactChecking Trump's State of the Union Address") rather than checkable statements. A future improvement is to extract specific sub-claims from article bodies.
+**Claim extraction:** The current feed parser uses the article headline as the claim text. Headlines are not always precise factual claims. A future improvement is to extract specific sub-claims from article bodies.
 
 **No deduplication:** The same claim can appear across multiple feeds on multiple days. A content-hash dedup layer would prevent redundant research.
 
 ---
 
-## 10. Planned Upgrades
+## 10. Changelog
 
-- Add web search tool to the Researcher agent so Claude can fetch live article content
+| Version | Date | Changes |
+|---|---|---|
+| v1.0 | 2026-03-02 | Initial skeleton — LangGraph pipeline, Pydantic models, Claude Researcher, GPT Director, GitHub Pages publishing |
+| v1.1 | 2026-03-02 | Added `fetch_url` tool-use loop to Researcher — Claude now reads live articles instead of relying solely on training knowledge |
+
+---
+
+## 11. Planned Upgrades
+
+- LangGraph checkpointing so the pipeline can resume after a crash
+- Human-in-the-loop approval node between verdict and publish
 - Extract specific sub-claims from article bodies rather than using headlines
 - Add claim deduplication across days
-- Add a `--date` flag to re-run the pipeline for a specific past date
-- Enable GitHub Pages deployment so the site is publicly accessible
+- Multi-day trends page showing verdict distribution over time

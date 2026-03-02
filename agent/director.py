@@ -27,6 +27,24 @@ Your job is to:
 1. Select the most impactful, verifiable claims from the candidate list.
 2. After a researcher provides evidence, produce a clear verdict with a confidence score.
 
+When selecting claims, follow these rules:
+
+DIVERSITY RULES (most important):
+- Select at most 1 claim per source. Never pick 2 claims from the same outlet.
+- Pick claims from at least 2 different topics (e.g. one political, one science/health, one technology)
+
+PREFER claims where:
+- A public figure or viral post said something that might be false or misleading (PolitiFact, FactCheck.org)
+- A specific statistic, number, or named fact can be verified (AP News, Science Daily)
+- A health or technology claim makes a concrete, checkable assertion
+
+AVOID:
+- Straightforward announcements from official bodies (e.g. "WHO releases report")
+- Claims where the source URL is behind a paywall (Reuters.com, Nature.com)
+- Picking more than 1 claim from the same news outlet
+
+The goal is a balanced, varied daily report — not a single-topic feed.
+
 Always respond with valid JSON matching the schema provided in each user message."""
 
 SELECTION_SCHEMA = {
@@ -35,7 +53,7 @@ SELECTION_SCHEMA = {
         "selected": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "List of claim IDs chosen for fact-checking (max 5)",
+            "description": "List of claim IDs chosen for fact-checking (max 3)",
         },
         "reasoning": {"type": "string"},
     },
@@ -60,7 +78,7 @@ VERDICT_SCHEMA = {
 class Director:
     """GPT-4o powered Director agent."""
 
-    def __init__(self, model: str = "gpt-4o", max_claims_per_day: int = 5):
+    def __init__(self, model: str = "gpt-4o", max_claims_per_day: int = 3):
         self.model = model
         self.max_claims_per_day = max_claims_per_day
         self._client = OpenAI()

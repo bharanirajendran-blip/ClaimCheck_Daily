@@ -130,5 +130,8 @@ Create the repo on github.com first (empty, no README), then push.
 You have no commits yet. Run `git add . && git commit -m "initial"` first.
 Or your branch is named `master` — use `git branch -m master main` to rename it.
 
-**All verdicts come back as `UNVERIFIABLE`**
-Claude's knowledge cuts off in early 2025. Claims about 2026 events cannot be verified from training data alone. The fix is to add a web search tool to the Researcher — this is a planned upgrade.
+**Paywalled articles come back with login page content**
+The `fetch_url` tool can only read publicly accessible pages. Paywalled sources (NYT, WSJ, etc.) will return a login wall. Claude will note this and fall back to training knowledge for those specific sources.
+
+**`ModuleNotFoundError: bs4`**
+Run `pip install beautifulsoup4` — required for the fetch_url web tool.

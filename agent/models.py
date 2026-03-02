@@ -94,7 +94,7 @@ class PipelineState(BaseModel):
     feeds_path:  str = "feeds.yaml"
     docs_dir:    str = "docs"
     outputs_dir: str = "outputs"
-    max_workers: int = 3
+    max_workers: int = 1  # sequential to stay within 30k tokens/min rate limit
 
     # Data fields populated progressively by each node
     candidates:       list[Claim]               = Field(default_factory=list)
