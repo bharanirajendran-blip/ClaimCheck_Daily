@@ -1,8 +1,8 @@
 # GitHub Pages / Jekyll configuration for ClaimCheck Daily
 title: ClaimCheck Daily
 description: Automated fact-checking powered by Claude + GPT-4o
-baseurl: ""          # set to "/ClaimCheck_Daily" if hosting as a project page
-url: ""              # e.g. "https://yourusername.github.io"
+baseurl: "/ClaimCheck_Daily"
+url: "https://bharanirajendran-blip.github.io"
 
 # We're writing plain HTML, so disable Jekyll processing on HTML files
 # but keep it active so GitHub Pages serves the site correctly.
