@@ -238,6 +238,8 @@ python run.py --feeds my_feeds.yaml --log-level DEBUG --workers 5
 
 **No deduplication:** The same claim can appear across multiple feeds on multiple days. A content-hash dedup layer would prevent redundant research.
 
+**GitHub Actions workflow (currently disabled):** The `.github/workflows/daily.yml` cron job is disabled. To re-enable automation, the repo should be set to private first, then API keys added as GitHub Secrets (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`) under Settings → Secrets and variables → Actions, and the workflow re-enabled from the Actions tab. Until then, run the pipeline locally with `python run.py`.
+
 ---
 
 ## 10. Changelog
