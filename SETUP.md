@@ -40,7 +40,7 @@ Save the file. It stays on your machine and is never uploaded to GitHub.
 python run.py --dry-run
 ```
 
-This parses all feeds, harvests claim candidates, and asks GPT to select the top 5 — but skips the Claude research step. Good for checking everything is wired up correctly.
+This parses all feeds, harvests claim candidates, and asks GPT to select the top 3 — but skips the Claude research step. Good for checking everything is wired up correctly.
 
 ### 4. Run the full pipeline
 
@@ -50,8 +50,8 @@ python run.py
 
 This runs the complete pipeline:
 1. Parses 7 RSS feeds → ~40 candidate claims
-2. GPT-4o selects the 5 best claims
-3. Claude researches each claim in parallel
+2. GPT-4o selects the 3 best claims (diverse sources and topics)
+3. Claude researches each claim sequentially, fetching live articles
 4. GPT-4o synthesises a verdict for each
 5. Publishes `docs/YYYY-MM-DD.html` and `outputs/YYYY-MM-DD.json`
 
@@ -72,8 +72,8 @@ python run.py --log-level DEBUG
 # Dry run (skip Claude research)
 python run.py --dry-run
 
-# Control parallel Claude workers (default: 3)
-python run.py --workers 5
+# Control Claude workers (default: 1, sequential to stay within rate limits)
+python run.py --workers 2
 ```
 
 ---
@@ -111,8 +111,8 @@ OPENAI_API_KEY=sk-...             # GPT Director
 ANTHROPIC_MODEL=claude-sonnet-4-5-20250929   # use Sonnet for lower cost
 OPENAI_MODEL=gpt-4o
 LOG_LEVEL=INFO                    # DEBUG | INFO | WARNING | ERROR
-MAX_CLAIMS_PER_DAY=5
-RESEARCH_WORKERS=3
+MAX_CLAIMS_PER_DAY=3
+RESEARCH_WORKERS=1
 USE_EXTENDED_THINKING=true
 ```
 
@@ -121,7 +121,7 @@ USE_EXTENDED_THINKING=true
 ## Troubleshooting
 
 **`max_tokens must be greater than thinking.budget_tokens`**
-This is fixed in the current version. If you see it, make sure you have the latest `researcher.py` (`max_tokens=16000`, `thinking_budget=10000`).
+This is fixed in the current version. If you see it, make sure you have the latest `researcher.py` (`max_tokens=10000`, `thinking_budget=3000`).
 
 **`Repository not found` when pushing to GitHub**
 Create the repo on github.com first (empty, no README), then push.

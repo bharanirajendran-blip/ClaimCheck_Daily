@@ -21,22 +21,26 @@ The core idea is a two-agent architecture where each agent does what it is best 
 ### 2.1 Agent Roles
 
 **Director (GPT-4o)**
-- Reads all harvested claim candidates and selects the top 5 most impactful and verifiable ones for the day
+- Reads all harvested claim candidates and selects the top 3 most impactful and verifiable ones for the day
+- Enforces source diversity — no two claims from the same outlet, covering at least 2 different topics (political, science, technology)
+- Prefers disputed claims from PolitiFact/FactCheck.org, avoids press releases and paywalled sources
 - After research is complete, synthesises a structured verdict for each claim including a label, confidence score, summary, and key evidence
 - Uses OpenAI's JSON mode to guarantee parseable structured output
 
 **Researcher (Claude Opus)**
 - Receives one claim at a time from the pipeline
 - Runs an agentic tool-use loop: calls `fetch_url` to read live article content, then reasons over it
-- Uses extended thinking (10,000 budget tokens, 16,000 max tokens) to deeply reason through the claim
+- Uses extended thinking (3,000 budget tokens, 10,000 max tokens) to deeply reason through the claim
+- Fetches the source URL first, then at most one corroborating source — writes findings immediately after
 - Produces a structured research report covering sub-questions, supporting evidence, contradicting evidence, caveats, and key sources
-- Multiple claims are researched in parallel using a ThreadPoolExecutor
+- Claims are researched sequentially (max_workers=1) to stay within API rate limits
 
 **fetch_url tool**
 - Defined in `agent/tools.py` using the Anthropic tool-use API schema
 - Fetches a URL using `httpx`, strips HTML with BeautifulSoup, returns clean plain text
-- Truncates to 8,000 characters to stay within context window limits
+- Truncates to 4,000 characters to stay within context window limits
 - Claude decides autonomously when and what to fetch — it is not hardcoded
+- Max 5 tool-use rounds per claim to prevent infinite loops
 
 ### 2.2 Researcher Agentic Tool-Use Loop
 
@@ -68,10 +72,10 @@ START
 harvest_node       ← parse RSS/Atom feeds → candidate Claims
   │
   ▼ (conditional: abort if no candidates)
-select_node        ← Director (GPT-4o) picks top 5 claims
+select_node        ← Director (GPT-4o) picks top 3 claims (diverse sources/topics)
   │
   ▼ (conditional: abort if nothing selected)
-research_node      ← Researcher (Claude + fetch_url) investigates in parallel
+research_node      ← Researcher (Claude + fetch_url) investigates sequentially
   │
   ▼
 verdict_node       ← Director synthesises one Verdict per ResearchResult
@@ -157,7 +161,7 @@ Configured in `feeds.yaml`. Seven sources across four categories:
 | WHO — News | health |
 | MIT Technology Review | technology |
 
-Each run harvests up to 10 entries per feed (70 candidates max), which the Director narrows to 5.
+Each run harvests up to 10 entries per feed (70 candidates max), which the Director narrows to 3.
 
 ---
 
@@ -242,6 +246,7 @@ python run.py --feeds my_feeds.yaml --log-level DEBUG --workers 5
 |---|---|---|
 | v1.0 | 2026-03-02 | Initial skeleton — LangGraph pipeline, Pydantic models, Claude Researcher, GPT Director, GitHub Pages publishing |
 | v1.1 | 2026-03-02 | Added `fetch_url` tool-use loop to Researcher — Claude now reads live articles instead of relying solely on training knowledge |
+| v1.2 | 2026-03-07 | Tuned for reliability — reduced claims to 3, sequential research, 3k thinking budget, 4k content cap, Director diversity rules, Researcher stop-early prompt |
 
 ---
 

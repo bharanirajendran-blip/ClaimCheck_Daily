@@ -1,0 +1,44 @@
+{
+  "date": "2026-03-07",
+  "generated_at": "2026-03-07T13:37:26Z",
+  "results": [
+    {
+      "claim": "Trump and Musk Amplify Long-Ago Debunked  Mail-In Vote Fraud Claim",
+      "source": "FactCheck.org",
+      "verdict": "TRUE",
+      "confidence": 0.95,
+      "summary": "The claim that Trump and Musk amplified a long-ago debunked mail-in vote fraud claim is accurate. The viral post they shared falsely compared mail-in ballot statistics from different elections, suggesting fraud. Official records confirm the post's figures were incorrect, and the claim has been thoroughly debunked by reliable sources.",
+      "key_evidence": [
+        "Official Pennsylvania records show 2,673,272 mail-in ballots were approved for the 2020 general election, with 2,273,490 cast.",
+        "Charles Stewart III from MIT confirmed the viral post mixed statistics from the primary and general elections.",
+        "FactCheck.org documented Musk and Trump's amplification of the false claim."
+      ]
+    },
+    {
+      "claim": "Antarctica has a strange gravity hole and scientists finally know why",
+      "source": "Science Daily — Top Science",
+      "verdict": "TRUE",
+      "confidence": 0.95,
+      "summary": "The claim that Antarctica has a measurable gravity anomaly is accurate. Peer-reviewed research explains this anomaly as a result of deep mantle rock movements over millions of years, which aligns with known geophysical principles. The term 'gravity hole' is informal but not misleading.",
+      "key_evidence": [
+        "Peer-reviewed publication in Scientific Reports, a reputable journal in the Nature Portfolio.",
+        "Research conducted by credible scientists: Dr. Alessandro Forte and Dr. Petar Glišović.",
+        "Gravity variations across Earth's surface are well-documented and consistent with geophysical principles.",
+        "The study provides a mechanistic explanation involving deep mantle dynamics."
+      ]
+    },
+    {
+      "claim": "This startup claims it can stop lightning and prevent catastrophic wildfires",
+      "source": "MIT Technology Review",
+      "verdict": "MIXED",
+      "confidence": 0.7,
+      "summary": "The claim that a startup can stop lightning and prevent catastrophic wildfires is partially true but with significant caveats. The company, Skyward Wildfire, asserts this capability, but its initial claim of 100% prevention was retracted. The technology has some historical basis but lacks large-scale validation. Experts are skeptical, and transparency issues exist regarding field trials and materials used.",
+      "key_evidence": [
+        "The company initially claimed 100% prevention but retracted this after scrutiny.",
+        "Skyward Wildfire uses metallic chaff for cloud seeding, a technique with some historical precedent.",
+        "Experts express skepticism about the feasibility of the company's claims.",
+        "The company has conducted field trials but lacks transparency about the materials used."
+      ]
+    }
+  ]
+}
